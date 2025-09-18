@@ -1,12 +1,52 @@
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, Send, CheckSquare, AlertCircle } from "lucide-react";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 interface ThankYouPageProps {
   onRestart?: () => void;
+  surveyResponseId?: string | null;
 }
 
-export default function ThankYouPage({ onRestart }: ThankYouPageProps) {
+export default function ThankYouPage({ onRestart, surveyResponseId }: ThankYouPageProps) {
+  const { toast } = useToast();
+  const [webhookSent, setWebhookSent] = useState(false);
+
+  // Mutation for sending to Make.com webhook
+  const sendToMake = useMutation({
+    mutationFn: async () => {
+      const result = await apiRequest('POST', '/api/survey/send-to-make', { 
+        surveyResponseId 
+      });
+      return result.json();
+    },
+    onSuccess: () => {
+      setWebhookSent(true);
+      toast({
+        title: "Succesvol verzonden!",
+        description: "Je antwoorden zijn verzonden naar Make.com voor verdere verwerking.",
+        duration: 5000,
+      });
+    },
+    onError: (error) => {
+      console.error('Error sending to Make.com:', error);
+      toast({
+        title: "Verzending mislukt",
+        description: "Er is een probleem opgetreden bij het verzenden naar Make.com. Probeer het opnieuw.",
+        variant: "destructive",
+        duration: 5000,
+      });
+    },
+  });
+
+  const handleSendToMake = () => {
+    if (surveyResponseId) {
+      sendToMake.mutate();
+    }
+  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-twofeetup-dark-purple to-twofeetup-blue flex items-center justify-center p-4">
       <Card className="w-full max-w-2xl p-8 bg-white/95 backdrop-blur-sm text-center">
@@ -48,9 +88,48 @@ export default function ThankYouPage({ onRestart }: ThankYouPageProps) {
           </p>
           
           <div className="pt-4">
-            <p className="text-sm text-twofeetup-black/60 mb-4">
+            <p className="text-sm text-twofeetup-black/60 mb-6">
               Heb je nog vragen over dit traject? Neem contact op met het management team.
             </p>
+            
+            {/* Make.com webhook button */}
+            {surveyResponseId && (
+              <div className="mb-6">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                  <h4 className="font-medium text-twofeetup-black mb-2">Automatische verwerking</h4>
+                  <p className="text-sm text-twofeetup-black/70 mb-3">
+                    Wil je je antwoorden ook verzenden naar ons Make.com automatiseringssysteem 
+                    voor directe verwerking en analyse?
+                  </p>
+                  
+                  {!webhookSent ? (
+                    <Button 
+                      onClick={handleSendToMake}
+                      disabled={sendToMake.isPending}
+                      className="bg-twofeetup-purple hover:bg-twofeetup-purple/90"
+                      data-testid="button-send-to-make"
+                    >
+                      {sendToMake.isPending ? (
+                        <>
+                          <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2" />
+                          Verzenden...
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-4 h-4 mr-2" />
+                          Naar Make.com verzenden
+                        </>
+                      )}
+                    </Button>
+                  ) : (
+                    <div className="flex items-center text-green-600">
+                      <CheckSquare className="w-4 h-4 mr-2" />
+                      <span className="text-sm font-medium">Succesvol verzonden naar Make.com!</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
             
             {onRestart && (
               <Button 

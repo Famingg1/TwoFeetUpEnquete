@@ -27,6 +27,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Make.com webhook endpoint
+  app.post("/api/survey/send-to-make", async (req, res) => {
+    try {
+      const { surveyResponseId } = req.body;
+      
+      if (!surveyResponseId) {
+        return res.status(400).json({
+          success: false,
+          message: "Survey response ID is required"
+        });
+      }
+
+      // Get the survey response from storage
+      const surveyResponse = await storage.getSurveyResponse(surveyResponseId);
+      
+      if (!surveyResponse) {
+        return res.status(404).json({
+          success: false,
+          message: "Survey response not found"
+        });
+      }
+
+      // Format data for Make.com webhook
+      const webhookData = {
+        survey_id: surveyResponse.id,
+        submitted_at: surveyResponse.submittedAt.toISOString(),
+        responses: surveyResponse.responses
+      };
+
+      // Send to Make.com webhook
+      const webhookUrl = "https://hook.eu2.make.com/acjgk31ajw9eeoe113rdesiyx3a7luco";
+      const response = await fetch(webhookUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(webhookData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Webhook failed with status: ${response.status}`);
+      }
+
+      res.status(200).json({
+        success: true,
+        message: "Survey response sent to Make.com successfully"
+      });
+    } catch (error) {
+      console.error("Error sending to Make.com webhook:", error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to send survey response to Make.com"
+      });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;

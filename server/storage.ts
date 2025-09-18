@@ -13,6 +13,7 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   createSurveyResponse(response: InsertSurveyResponse): Promise<SurveyResponse>;
+  getSurveyResponse(id: string): Promise<SurveyResponse | undefined>;
 }
 
 // Create database connection
@@ -42,6 +43,11 @@ export class DatabaseStorage implements IStorage {
     console.log('Saving survey response to database:', insertResponse);
     const result = await db.insert(surveyResponses).values(insertResponse).returning();
     console.log('Survey response saved:', result[0]);
+    return result[0];
+  }
+
+  async getSurveyResponse(id: string): Promise<SurveyResponse | undefined> {
+    const result = await db.select().from(surveyResponses).where(eq(surveyResponses.id, id)).limit(1);
     return result[0];
   }
 }

@@ -13,6 +13,7 @@ export default function Home() {
   const [state, setState] = useState<SurveyState>('welcome');
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({});
+  const [surveyResponseId, setSurveyResponseId] = useState<string | null>(null);
 
   // Mutation for submitting survey
   const submitSurvey = useMutation({
@@ -22,6 +23,7 @@ export default function Home() {
     },
     onSuccess: (data) => {
       console.log('Survey submitted successfully:', data);
+      setSurveyResponseId(data.id);
       setState('complete');
     },
     onError: (error) => {
@@ -66,6 +68,7 @@ export default function Home() {
     setState('welcome');
     setCurrentQuestion(0);
     setAnswers({});
+    setSurveyResponseId(null);
     console.log('Survey restarted');
   };
 
@@ -85,7 +88,7 @@ export default function Home() {
   }
 
   if (state === 'complete') {
-    return <ThankYouPage onRestart={handleRestart} />;
+    return <ThankYouPage onRestart={handleRestart} surveyResponseId={surveyResponseId} />;
   }
 
   const question = surveyQuestions[currentQuestion];
