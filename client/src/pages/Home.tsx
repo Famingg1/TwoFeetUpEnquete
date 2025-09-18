@@ -1,16 +1,35 @@
 import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import WelcomePage from '@/components/WelcomePage';
 import SurveyQuestion from '@/components/SurveyQuestion';
 import ThankYouPage from '@/components/ThankYouPage';
 import ProgressBar from '@/components/ProgressBar';
 import { surveyQuestions } from '@/data/surveyQuestions';
+import { apiRequest } from '@/lib/queryClient';
 
-type SurveyState = 'welcome' | 'survey' | 'complete';
+type SurveyState = 'welcome' | 'survey' | 'complete' | 'submitting';
 
 export default function Home() {
   const [state, setState] = useState<SurveyState>('welcome');
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({});
+
+  // Mutation for submitting survey
+  const submitSurvey = useMutation({
+    mutationFn: async (responses: Record<string, any>) => {
+      const result = await apiRequest('POST', '/api/survey/submit', { responses });
+      return result.json();
+    },
+    onSuccess: (data) => {
+      console.log('Survey submitted successfully:', data);
+      setState('complete');
+    },
+    onError: (error) => {
+      console.error('Error submitting survey:', error);
+      // For now, still show completion page but log the error
+      setState('complete');
+    },
+  });
 
   const handleStart = () => {
     setState('survey');
@@ -30,9 +49,10 @@ export default function Home() {
     if (currentQuestion < surveyQuestions.length - 1) {
       setCurrentQuestion(prev => prev + 1);
     } else {
-      // Save final answers (in a real app, this would send to backend)
+      // Submit survey to backend
       console.log('Survey completed! Final answers:', answers);
-      setState('complete');
+      setState('submitting');
+      submitSurvey.mutate(answers);
     }
   };
 
@@ -51,6 +71,17 @@ export default function Home() {
 
   if (state === 'welcome') {
     return <WelcomePage onStart={handleStart} />;
+  }
+
+  if (state === 'submitting') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-twofeetup-dark-purple to-twofeetup-blue flex items-center justify-center p-4">
+        <div className="bg-white/95 backdrop-blur-sm p-8 rounded-lg text-center">
+          <div className="animate-spin w-8 h-8 border-4 border-twofeetup-purple border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-twofeetup-black">Je antwoorden worden opgeslagen...</p>
+        </div>
+      </div>
+    );
   }
 
   if (state === 'complete') {
