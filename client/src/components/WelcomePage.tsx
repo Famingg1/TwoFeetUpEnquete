@@ -42,26 +42,13 @@ export default function WelcomePage({ onStart }: WelcomePageProps) {
             </p>
           </div>
           
-          <div>
-            <p className="font-medium mb-3">Via deze vragenlijst willen we graag weten:</p>
-            <ul className="space-y-2 text-sm ml-4">
-              <li className="flex items-start">
-                <span className="w-2 h-2 bg-twofeetup-purple rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                Welke taken je energie geven vs. kosten
-              </li>
-              <li className="flex items-start">
-                <span className="w-2 h-2 bg-twofeetup-purple rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                Waar je tegenaan loopt in je dagelijks werk
-              </li>
-              <li className="flex items-start">
-                <span className="w-2 h-2 bg-twofeetup-purple rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                Wat volgens jou beter kan
-              </li>
-              <li className="flex items-start">
-                <span className="w-2 h-2 bg-twofeetup-purple rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                Welke "AI-collega" jij zou willen hebben
-              </li>
-            </ul>
+          <div className="bg-gradient-to-r from-twofeetup-purple/10 to-twofeetup-blue/10 p-6 rounded-lg border border-twofeetup-purple/20">
+            <p className="font-medium text-twofeetup-black mb-2">💡 Gedachte-experiment:</p>
+            <p className="text-sm">
+              Om een helder beeld te krijgen, vragen we je om de vragenlijst te benaderen als een <strong>gedachte-experiment</strong>. 
+              Stel je voor dat alles mogelijk is, ook als het ambitieus klinkt. Zo kunnen wij jullie uitdagingen 
+              beter vertalen naar gerichte en creatieve oplossingen.
+            </p>
           </div>
           
           <p className="text-sm">

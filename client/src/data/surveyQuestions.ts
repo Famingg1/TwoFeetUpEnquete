@@ -2,62 +2,37 @@ import { Question } from '@/components/SurveyQuestion';
 
 export const surveyQuestions: Question[] = [
   {
-    id: 'energy-tasks',
+    id: 'automation-dream',
+    type: 'text',
+    title: 'In een wereld waarin alles mogelijk is. Wat zou je dan het allerliefste automatiseren binnen je huidige werkzaamheden?',
+    description: 'Denk groot en ambitieus. Wat zou je werkdag het meest verbeteren?',
+    required: true
+  },
+  {
+    id: 'automation-wishlist',
+    type: 'text',
+    title: 'Wat zijn nog meer dingen die op je wensenlijst staan binnen jouw werkzaamheden op het gebied van AI & automatisering?',
+    description: 'Deel al je ideeën, ook de kleinere verbeteringen die je voor je ziet.',
+    required: true
+  },
+  {
+    id: 'process-experience',
     type: 'multiple-choice',
-    title: 'Welke taken geven je het meeste energie?',
-    description: 'Kies het antwoord dat het beste bij je past.',
+    title: 'Hoe ervaar jij de processen binnen je eigen rol?',
+    description: 'Kies het niveau dat het beste bij je huidige situatie past.',
     options: [
-      'Creatief werk en brainstormsessies',
-      'Klantcontact en directe communicatie',
-      'Strategisch denken en lange termijn planning',
-      'Technische uitdagingen oplossen',
-      'Teamwork en samenwerking',
-      'Anders, namelijk...'
+      'Niveau 1 - Vooral handmatig en veel losse bestanden',
+      'Niveau 2 - We gebruiken systemen, maar die werken niet echt samen',
+      'Niveau 3 - Systemen die samenwerken, maar weinig automatische processen',
+      'Niveau 4 - Processen zijn grotendeels geïntegreerd en goed ingericht'
     ],
     required: true
   },
   {
-    id: 'energy-draining',
-    type: 'checkbox',
-    title: 'Welke taken kosten je juist veel energie?',
-    description: 'Selecteer alle antwoorden die van toepassing zijn.',
-    options: [
-      'Repetitieve administratieve taken',
-      'Handmatige data-invoer',
-      'Het zoeken naar informatie in verschillende systemen',
-      'Rapportages maken',
-      'Email management',
-      'Plannen en coordinatie',
-      'Vergaderingen bijwonen/organiseren'
-    ],
-    required: true
-  },
-  {
-    id: 'daily-challenges',
+    id: 'keep-manual',
     type: 'text',
-    title: 'Waar loop je het vaakst tegenaan in je dagelijks werk?',
-    description: 'Beschrijf kort de grootste frustraties of knelpunten die je ervaart.',
-    required: true
-  },
-  {
-    id: 'improvement-areas',
-    type: 'text',
-    title: 'Wat zou volgens jou beter kunnen in onze werkprocessen?',
-    description: 'Denk aan efficiency, samenwerking, tools, communicatie, etc.',
-    required: true
-  },
-  {
-    id: 'ai-enthusiasm',
-    type: 'rating',
-    title: 'Hoe enthousiast ben je over het gebruik van AI in je werk?',
-    description: 'Geef een score van 1 (helemaal niet enthousiast) tot 10 (zeer enthousiast).',
-    required: true
-  },
-  {
-    id: 'ai-colleague',
-    type: 'text',
-    title: 'Welke "AI-collega" zou jij willen hebben?',
-    description: 'Beschrijf welke taken deze AI-assistent voor jou zou kunnen uitvoeren om je werk leuker en efficiënter te maken.',
+    title: 'Wat zou je, zelfs als het te automatiseren zou zijn, te allen tijde zelf willen blijven doen?',
+    description: 'Welke taken geven je energie en zou je nooit uit handen willen geven?',
     required: true
   }
 ];
