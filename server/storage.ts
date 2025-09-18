@@ -1,5 +1,9 @@
-import { type User, type InsertUser, type SurveyResponse, type InsertSurveyResponse } from "@shared/schema";
+import { type User, type InsertUser, type SurveyResponse, type InsertSurveyResponse, users, surveyResponses } from "@shared/schema";
 import { randomUUID } from "crypto";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { eq } from "drizzle-orm";
+import pkg from "pg";
+const { Pool } = pkg;
 
 // modify the interface with any CRUD methods
 // you might need
@@ -11,42 +15,35 @@ export interface IStorage {
   createSurveyResponse(response: InsertSurveyResponse): Promise<SurveyResponse>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<string, User>;
-  private surveyResponses: Map<string, SurveyResponse>;
+// Create database connection
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
 
-  constructor() {
-    this.users = new Map();
-    this.surveyResponses = new Map();
-  }
+const db = drizzle(pool);
 
+export class DatabaseStorage implements IStorage {
   async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
+    const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
+    return result[0];
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const result = await db.select().from(users).where(eq(users.username, username)).limit(1);
+    return result[0];
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
-    return user;
+    const result = await db.insert(users).values(insertUser).returning();
+    return result[0];
   }
 
   async createSurveyResponse(insertResponse: InsertSurveyResponse): Promise<SurveyResponse> {
-    const id = randomUUID();
-    const response: SurveyResponse = { 
-      ...insertResponse, 
-      id,
-      submittedAt: new Date()
-    };
-    this.surveyResponses.set(id, response);
-    return response;
+    console.log('Saving survey response to database:', insertResponse);
+    const result = await db.insert(surveyResponses).values(insertResponse).returning();
+    console.log('Survey response saved:', result[0]);
+    return result[0];
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
